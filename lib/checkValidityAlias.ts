@@ -12,5 +12,5 @@ export default async function checkValidityAlias(alias:string){
         return null;
     }
 
-    return(true);
+    return(data.URL);
 }

@@ -10,5 +10,5 @@ export default async function createNewURL(url:string, alias:string){
   }
 
   const urlCollection = await getCollection(URL_COLLECTION);
-  const resDB = await urlCollection.insertOne(p);
+  await urlCollection.insertOne(p);
 }
