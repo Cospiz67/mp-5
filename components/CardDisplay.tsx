@@ -22,7 +22,7 @@ const StyledInputURL = styled.input`
   margin: 0 0 4%;
 `
 const StyledInputAlias = styled.input`
-    width: 35%;
+    width: 25%;
     margin: 0 1% 4%;
 `
 const StyledError = styled.p`
@@ -82,7 +82,7 @@ export default function CardDisplay() {
 
     function createShortCut() {
         createNewURL(url, alias).catch((err) => console.log(err));
-        setResult("http://localhost:3000/" + alias);
+        setResult("https://mp-5-tawny.vercel.app/" + alias);
     }
 
     function checkURL(e: ChangeEvent<HTMLInputElement>) {
@@ -137,7 +137,7 @@ export default function CardDisplay() {
             <StyledLabel htmlFor="URL to shorten">URL to shorten:</StyledLabel>
             <StyledInputURL required autoComplete="off" placeholder="ex: https://example.com" onChange={(e) => checkURL(e)}></StyledInputURL>
             <StyledP>Customized URL:</StyledP>
-            <label htmlFor="https://vercel.app/">https://vercel.app/</label>
+            <label htmlFor="https://mp-5-tawny.vercel.app/">https://mp-5-tawny.vercel.app/</label>
             <StyledInputAlias required autoComplete="off" placeholder="alias" onChange={(e) =>checkAlias(e)}></StyledInputAlias>
             <StyledError>{error}</StyledError>
             <StyledButton onClick={createShortCut} disabled={!(isAliasValid && isURLValid)}>Click to Shorten URL</StyledButton>
