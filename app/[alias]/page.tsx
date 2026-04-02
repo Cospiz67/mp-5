@@ -1,14 +1,11 @@
-"use client"
+"use server";
 import checkValidityAlias from "@/lib/checkValidityAlias";
-import {useParams} from "next/navigation";
 import {redirect} from "next/navigation";
 
-export default async function urlRedirect(){
-    const params = useParams<{ alias: string }>();
-    const res =await checkValidityAlias(params.alias);
-
+export default async function urlRedirect({params}:{params:Promise<{alias:string}>}){
+    const res = await checkValidityAlias((await params).alias);
+    console.log(res);
     if(res === null)
-        return redirect(`/error`);
-    
-    return redirect(res);
+        redirect(`/error`);
+    redirect(res);
 }

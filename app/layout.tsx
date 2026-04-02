@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const StyledDiv = styled.div`
   min-height: 100vh;
-  background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  background: linear-gradient(180deg, #aecaf6 0%, #7fb7d1 100%);
 `
 
 export default function RootLayout({

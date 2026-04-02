@@ -1,6 +1,6 @@
 "use client"
 import styled from "styled-components";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import createNewURL from "@/lib/createNewURL";
 import checkValidityAlias from "@/lib/checkValidityAlias";
 import checkValidityURL from "@/lib/checkValidityURL";
@@ -11,7 +11,11 @@ const StyledCard = styled.div`
   width: 50%;
   padding: 5%;
   border-radius: 15px;
+  border: 2px solid #3170d5;
   margin: 0 auto;
+`
+const StyledLabel = styled.label`
+    font-weight: bold;
 `
 const StyledInputURL = styled.input`
   width: 100%;
@@ -28,89 +32,123 @@ const StyledError = styled.p`
   text-align:center;
 `
 const StyledResult = styled(Link)`
+    margin: 0% auto;
+`
+const StyledButton = styled.button`
+    background-color: #3170d5;
+    padding: 1% 7%;
+    border-radius: 75px;
+    border: 3px solid white;
+    color: white;
+    display: flex;
+    margin: 0 auto;
+    
+    &:disabled{
+        background-color: #8aa5d195;
+        cursor: not-allowed;
+    }
+`
+const ButtonCopy = styled.button`
+    background: url("./copy.png");
+    background-size: contain;
+    height: 5vw;
+    width: 5vw;
+    border: none;
+    margin: 0 auto;
+`
+const StyledDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    margin: 4% 0 0;
+`
+const StyledArea = styled.div`
+    display: flex;
+    flex-direction: column;
+`
+const StyledP = styled.p`
+    font-weight: bold;
 `
 
 export default function CardDisplay() {
+    const [mounted, setMounted] = useState(false);
     const [url, setUrl] = useState("");
     const [alias, setAlias] = useState("");
-    const [isDisabled, setisDisabled] = useState(true);
+
+    const [isURLValid, setisURLValid] = useState(false);
+    const [isAliasValid, setisAliasValid] = useState(false);
+
     const [error, setError] = useState("");
     const [result, setResult] = useState("");
 
     function createShortCut() {
         createNewURL(url, alias).catch((err) => console.log(err));
-        setResult("https://localhost:3000/"+alias);
+        setResult("http://localhost:3000/" + alias);
     }
 
-    // function checkURL(e: ChangeEvent<HTMLInputElement>) {
-    //     setError("");
-    //     if (e.target.value === "") {
-    //         setisDisabled(true);
-    //         return;
-    //     }
-    //     const urlIsValid = checkValidityURL(e.target.value);
-    //     if (!urlIsValid) {
-    //         setisDisabled(true);
-    //         setError("Invalid URL: this URL does not exist.");
-    //     }
-    //     setUrl(e.target.value);
-    // }
     function checkURL(e: ChangeEvent<HTMLInputElement>) {
-        const urlIsValid = checkValidityURL(e.target.value);
+        const validity = checkValidityURL(e.target.value);
         setError("");
-        changeButton();
-        if (!urlIsValid) {
+        setUrl(e.target.value);
+        if (!validity) {
             setError("Invalid URL: this URL does not exist.");
-            setisDisabled(true);
+            setisURLValid(false);
             return;
         }
-        setUrl(e.target.value);
+        if (e.target.value === "") {
+            setisURLValid(false);
+            return;
+        }
+        setisURLValid(true);
     }
-
-    // async function checkAlias(e: ChangeEvent<HTMLInputElement>) {
-    //     const res = await checkValidityAlias(e.target.value);
-    //     setError("");
-    //     if (e.target.value === "") {
-    //         setisDisabled(true);
-    //         return;
-    //     }
-
-    //     if (res !== null) {
-    //         setError("Invalid alias: this alias already exists.");
-    //         setisDisabled(true);
-    //         return;
-    //     }
-
-    //     setisDisabled(url === "");
-    //     setAlias(e.target.value)
-    // }
 
     async function checkAlias(e: ChangeEvent<HTMLInputElement>) {
-        const res = await checkValidityAlias(e.target.value);
+        const validity = await checkValidityAlias(e.target.value);
         setError("");
-        changeButton();
-        if (res !== null) {
+        setAlias(e.target.value);
+        if (validity !== null) {
             setError("Invalid alias: this alias already exists.");
-            setisDisabled(true);
+            setisAliasValid(false);
             return;
         }
-        setAlias(e.target.value);
+        if (e.target.value === "") {
+            setisAliasValid(false);
+            return;
+        }
+        setisAliasValid(true);
     }
 
-    function changeButton(){
-        if(url!=="" && alias !== "")
-            setisDisabled(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return null;
+    } //this is to avoid tree hydration with the button
+
+    async function copyLink(e: React.MouseEvent<HTMLButtonElement>){
+        const button = e.currentTarget; 
+        await navigator.clipboard.writeText(window.location.href+alias);
+        button.style.background= "url(./copy_done.png)";
+        button.style.backgroundSize = "contain";
     }
 
     return (
         <StyledCard>
-            <label htmlFor="URL to shorten">URL to shorten:</label>
-            <StyledInputURL required placeholder="ex: https://example.com" onChange={(e) => checkURL(e)}></StyledInputURL>
+            <StyledLabel htmlFor="URL to shorten">URL to shorten:</StyledLabel>
+            <StyledInputURL required autoComplete="off" placeholder="ex: https://example.com" onChange={(e) => checkURL(e)}></StyledInputURL>
+            <StyledP>Customized URL:</StyledP>
             <label htmlFor="https://vercel.app/">https://vercel.app/</label>
-            <StyledInputAlias required placeholder="alias" onChange={(e) => checkAlias(e)}></StyledInputAlias>
+            <StyledInputAlias required autoComplete="off" placeholder="alias" onChange={(e) =>checkAlias(e)}></StyledInputAlias>
             <StyledError>{error}</StyledError>
-            <button onClick={createShortCut} >Click to Shorten URL</button>
-            <StyledResult href={result}>{result}</StyledResult>
+            <StyledButton onClick={createShortCut} disabled={!(isAliasValid && isURLValid)}>Click to Shorten URL</StyledButton>
+            {result &&
+            (<StyledDiv>
+                <StyledArea>
+                    <StyledP>Shortened URL:</StyledP>
+                    <StyledResult href={`/${alias}`}>{result}</StyledResult>
+                </StyledArea>
+                <ButtonCopy onClick={(e)=> copyLink(e)}></ButtonCopy> 
+            </StyledDiv>)}
         </StyledCard>
     )
 } 
