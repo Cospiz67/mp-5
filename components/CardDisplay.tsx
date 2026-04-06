@@ -102,6 +102,12 @@ export default function CardDisplay() {
     }
 
     async function checkAlias(e: ChangeEvent<HTMLInputElement>) {
+        if(e.target.value.includes('/') || e.target.value.includes('\\'))
+        {
+            setError("Invalid alias: alias cannot contain this character.");
+            setisAliasValid(false);
+            return;
+        }
         const validity = await checkValidityAlias(e.target.value);
         setError("");
         setAlias(e.target.value);
