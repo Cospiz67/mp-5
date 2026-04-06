@@ -14,6 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <title>URL Shortener</title>
       <body>
         <StyledDiv>
           <Header/>
